@@ -1,97 +1,34 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Unistyles repro: `rt.insets.top` stays when the status bar is hidden via `WindowInsetsControllerCompat` (Android ≤ 10)
 
-# Getting Started
+On Android 10 and lower, hiding the status bar with React Native's `StatusBar` (with `edgeToEdgeEnabled=true`) leaves `rt.insets.top` at the status bar height. Hiding it with `UnistylesRuntime.statusBar.setHidden(true)` reports `0`.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+- react-native 0.86.2
+- react-native-unistyles 3.8.2
+- react-native-nitro-modules 0.37.1
+- `android/gradle.properties`: `edgeToEdgeEnabled=true`
 
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+## Run
 
 ```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+npm install
+npx react-native run-android
 ```
 
-### iOS
+Use an Android 10 or lower device or emulator. The repro was recorded on a Samsung Galaxy A8 2018 (Android 9 / API 28).
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Steps
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+1. The red bar at the top has height `rt.insets.top`.
+2. Tap **Toggle UnistylesRuntime.statusBar**. The status bar hides and the red bar disappears.
+3. Tap it again. The status bar and the red bar come back.
+4. Tap **Toggle RN StatusBar**. The status bar hides, but the red bar stays at the status bar height (`rt.insets.top: 24`).
 
-```sh
-bundle install
-```
+## Recording
 
-Then, and every time you update your native dependencies, run:
+[docs/repro-android9.mp4](docs/repro-android9.mp4)
 
-```sh
-bundle exec pod install
-```
+| `UnistylesRuntime.statusBar.setHidden(true)` | `<StatusBar hidden />` |
+|---|---|
+| ![](docs/unistyles-hidden.png) | ![](docs/rn-statusbar-hidden.png) |
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+The repro code is in [`src/App.tsx`](src/App.tsx).
